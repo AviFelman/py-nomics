@@ -92,14 +92,14 @@ class nomicsREST(object):
 
 
     # price_to_dataframe allows you to input a list of coins and get their historic prices at the open of the days you've specificied. The specific column input is there to allow you to remove the returns column or the prices column if need be.
-    
-    def price_to_dataframe(self, coin_list, start_date, end_date, specific_column=None):
+
+    def get_multiple_coin_prices(self, coin_list, start_date, end_date, specific_column=None):
         df_final = pd.DataFrame()
         for coin in coin_list:
             coin_open = str(coin) + 'open'
             coin_returns = str(coin) + 'returns'
             df_temp = pd.DataFrame().from_dict(self.get_price_history(start_date, end_date, coin))[['close', 'timestamp']]
-            df_temp.rename(columns={'open': coin_close}, inplace=True)
+            df_temp.rename(columns={'open': coin_open}, inplace=True)
             df_temp[coin_returns] = pd.to_numeric(df_temp[coin_open]).pct_change(1)
 
             if(specific_column =='returns'):
