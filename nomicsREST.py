@@ -78,21 +78,25 @@ class nomicsREST(object):
         supply = json_normalize(self.get_supply_data(start_date))
 
         # This line extracts prices from the original dataframe
-        prices['prices'] = [item['prices'][0] for item in prices]
-
+        prices['prices'] = [item['prices'][0] for item in self.get_sparkline_data(start_date)]
         # Merge the dataframes to make multiplication easy
         market_cap_data = prices.merge(supply, how='left', on='currency')[['currency', 'prices', 'close_available']]
 
         # The only way to get market cap from Nomics data is to multiply supply and price together
         market_cap_data['market_cap'] = pd.to_numeric(market_cap_data['prices']) * pd.to_numeric(market_cap_data['close_available'])
 
-        # This piece of code is to pull out a specific coin's data if you only wanted 1
+        #Clean the DataFrame
+        market_cap_data.sort_values(['market_cap'], ascending=False, inplace=True)
+        market_cap_data.reset_index(inplace=True, drop=True)
+
+        # If coin is specific, only pull data for that specific coin
         if(coin is not None):
             return market_cap_data[market_cap_data['currency'] == coin]
         else:
             # Sort the data for ease of use
-            return market_cap_data.sort_values(['market_cap'], ascending=False, inplace=True)
+            return market_cap_data
 
+    # Get the marketcap for a specific coin over a period of time (Return: DataFrame)
     def get_historic_marketcap(self, coin, start_date, end_date):
         df_final = pd.DataFrame()
         date_list = pd.date_range(start_date, end_date).tolist()
@@ -107,8 +111,8 @@ class nomicsREST(object):
         return df_final
 
 
-    # price_to_dataframe allows you to input a list of coins and get their historic prices at the open of the days you've specificied. The specific column input is there to allow you to remove the returns column or the prices column if need be.
-
+    # Function get_multiple_coin_prices allows you to input a list of coins and get their historic prices at open (Return: DataFrame)
+    # The specific column input is there to allow you to remove the returns column or the prices column if need be.
     def get_multiple_coin_prices(self, coin_list, start_date, end_date, specific_column=None):
         df_final = pd.DataFrame()
         for coin in coin_list:
@@ -147,5 +151,5 @@ if __name__ == '__main__':
     '''
 
     nr = nomicsREST('')
-    coin_list = ['BTC', 'ETH', 'NANO'## to the moon]
-    prices = nr.get_historic_marketcap('BTC','2019-03-20', '2019-04-09')
+    coin_list = ['BTC', 'ETH', 'NANO'] #XRB to the moon
+    prices = nr.get_marketcap_snapshot('2019-04-06')
