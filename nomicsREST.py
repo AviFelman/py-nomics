@@ -132,7 +132,7 @@ class nomicsREST(object):
 
             ## Following statements allow you to pull specific columbs
             if(specific_column =='returns'):
-                df_temp.drop([coin_close], axis=1, inplace=True)
+                df_temp.drop([coin_open], axis=1, inplace=True)
 
             if(specific_column == 'prices'):
                 df_temp.drop([coin_returns], axis=1, inplace=True)
