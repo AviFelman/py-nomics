@@ -116,31 +116,32 @@ class nomicsREST(object):
     def get_multiple_coin_prices(self, coin_list, start_date, end_date, specific_column=None):
         df_final = pd.DataFrame()
         for coin in coin_list:
-
             coin_open = str(coin) + 'open'
             coin_returns = str(coin) + 'returns'
-
+            coin_total_returns = str(coin) + 'total_returns'
             df_temp = pd.DataFrame().from_dict(self.get_price_history(start_date, end_date, coin))
 
+            # Check if coin was successfully passed, if not, skip the coin
             if(df_temp.empty):
-                raise Exception(coin + " is not in nomics dataset")
-            else:
-                df_temp = df_temp[['open', 'timestamp']]
+                print(coin + " is not in nomics dataset")
+                continue
 
+            df_temp = df_temp[['open', 'timestamp']]
             df_temp.rename(columns={'open': coin_open}, inplace=True)
             df_temp[coin_returns] = pd.to_numeric(df_temp[coin_open]).pct_change(1)
+            df_temp[coin_total_returns] = (1 + df_temp[coin_returns]).cumprod() - 1
 
             ## Following statements allow you to pull specific columbs
             if(specific_column =='returns'):
                 df_temp.drop([coin_open], axis=1, inplace=True)
-
             if(specific_column == 'prices'):
-                df_temp.drop([coin_returns], axis=1, inplace=True)
+                df_temp.drop([coin_returns], [coin_total_returns], axis=1, inplace=True)
 
             if(coin == coin_list[0]):
                 df_final = df_temp
             else:
                 df_final = df_final.merge(df_temp, how='left', on='timestamp')
+
         return df_final.set_index('timestamp').fillna(method='ffill')
 
 
@@ -150,6 +151,7 @@ if __name__ == '__main__':
     Initialize the nomicsREST API, and start pulling data!
     '''
 
-    nr = nomicsREST('')
-    coin_list = ['BTC', 'ETH', 'NANO'] #XRB to the moon
-    prices = nr.get_marketcap_snapshot('2019-04-06')
+    nr = nomicsREST('d65a61fd8a7e9caa19861ba984fc383e')
+    coin_list = ['BTC', 'ZOEY', 'ETH', 'NANO', 'JOEY'] #XRB to the moon
+    prices = nr.get_multiple_coin_prices(coin_list, '2019-01-01', '2019-04-01')
+    print(prices)
