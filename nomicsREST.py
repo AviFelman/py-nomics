@@ -103,7 +103,7 @@ class nomicsREST(object):
         market_cap = []
         for date1 in date_list:
             date2 = date1.date()
-            df_temp = self.get_marketcap_data(date2, 'BTC')
+            df_temp = self.get_marketcap_data(date2, coin)
             df_temp.reset_index(inplace=True)
             market_cap.append(df_temp['market_cap'][0])
         df_final['date'] = date_list
@@ -113,6 +113,7 @@ class nomicsREST(object):
 
     # Function get_multiple_coin_prices allows you to input a list of coins and get their historic prices at open (Return: DataFrame)
     # The specific column input is there to allow you to remove the returns column or the prices column if need be.
+    # Also delivers total & daily returns
     def get_multiple_coin_prices(self, coin_list, start_date, end_date, specific_column=None):
         df_final = pd.DataFrame()
         for coin in coin_list:
@@ -151,7 +152,7 @@ if __name__ == '__main__':
     Initialize the nomicsREST API, and start pulling data!
     '''
 
-    nr = nomicsREST('d65a61fd8a7e9caa19861ba984fc383e')
+    nr = nomicsREST('')
     coin_list = ['BTC', 'ZOEY', 'ETH', 'NANO', 'JOEY'] #XRB to the moon
     prices = nr.get_multiple_coin_prices(coin_list, '2019-01-01', '2019-04-01')
     print(prices)
