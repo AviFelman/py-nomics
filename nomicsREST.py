@@ -3,6 +3,7 @@
 """
 @author: avifelman
 This program is meant for interfacing with the Nomics API, and delivering data on a per-need basis.
+This program offers additional functions that create extra constructed endpoints
 
 """
 
@@ -10,7 +11,7 @@ This program is meant for interfacing with the Nomics API, and delivering data o
 import pandas as pd, numpy as np, datetime, requests
 from pandas.io.json import json_normalize
 
-# Create the nomicsREST API class, which will contain specific functions
+# Create the nomicsREST API class, which will contain specific functions for pulling data
 class nomicsREST(object):
 
     # Initialize the class with API key and a URL
@@ -153,6 +154,6 @@ if __name__ == '__main__':
     '''
 
     nr = nomicsREST('')
-    coin_list = ['BTC', 'ZOEY', 'ETH', 'NANO', 'JOEY'] #XRB to the moon
-    prices = nr.get_multiple_coin_prices(coin_list, '2019-01-01', '2019-04-01')
+    coin_list = ['BTC', 'DCR'] #XRB to the moon
+    prices = nr.get_multiple_coin_prices(coin_list, '2016-01-01', '2019-07-010')
     print(prices)
